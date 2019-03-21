@@ -1,7 +1,6 @@
 import os
-from flask import Flask, render_template, session, redirect, url_for # tools that will make it easier to build on things
-from flask_sqlalchemy import SQLAlchemy # handles database stuff for us - need to pip install flask_sqlalchemy in your virtual env, environment, etc to use this and run this
-
+from flask import Flask, render_template, session, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 # Application configurations
 app = Flask(__name__)
 app.debug = True
@@ -19,16 +18,9 @@ session = db.session # to make queries easy
 
 
 
-
-
-#########
-######### Everything above this line is important/useful setup, not problem-solving.
-#########
-
-
 ##### Set up Models #####
 
-# Set up association Table between artists and albums
+# Set up association Table
 collections = db.Table('collections',db.Column('director_id',db.Integer, db.ForeignKey('Directors.id')),db.Column('distributor_id',db.Integer, db.ForeignKey('Distributors.id')))
 
 class Distributor(db.Model):
@@ -60,17 +52,11 @@ class Movie(db.Model):
     worldwide_gross = db.Column(db.Integer)
     us_dvd_sales = db.Column(db.Integer)
     production_budget = db.Column(db.Integer)
-    # ok to be null
-    # keeping genre as atomic element here even though in a more complex database it could be its own table and be referenced here
-
     def __repr__(self):
         return "{} by {} | {}".format(self.title,self.director_id, self.distributor_id, self.major_genre)
 
 
 ##### Helper functions #####
-
-### For database additions
-### Relying on global session variable above existing
 
 def get_or_create_director(director_name):
     director = Director.query.filter_by(name=director_name).first()
@@ -95,10 +81,9 @@ def get_or_create_distributor(distributor_name):
 
 ##### Set up Controllers (route functions) #####
 
-## Main route
 @app.route('/movie/new/<title>/<director>/<distributor>/<major_genre>/<us_gross>/<worldwide_gross>/<us_dvd_sales>/<production_budget>/')
 def new__movie(title, director, distributor, major_genre,us_gross,worldwide_gross,us_dvd_sales,production_budget):
-    if Movie.query.filter_by(title=title).first(): # if there is a song by that title
+    if Movie.query.filter_by(title=title).first():
         return "That movie already exists. Go back to the main app."
     else:
         director = get_or_create_director(director)
@@ -116,30 +101,21 @@ def index():
 
 @app.route('/all_movies')
 def see_all():
-    all_movies = [] # Will be be tuple list of title, genre
+    all_movies = []
     movies = Movie.query.all()
     for i in movies:
-        all_movies.append((i.title)) # get list of songs with info to easily access [not the only way to do this]
-    return render_template('all_movies.html',all_movies=all_movies) # check out template to see what it's doing with what we're sending!
+        all_movies.append((i.title))
+    return render_template('all_movies.html',all_movies=all_movies)
 
 @app.route('/all_directors')
 def see_director():
-    all_directors = [] # Will be be tuple list of title, genre
+    all_directors = []
     directors = Director.query.all()
     for i in directors:
-        all_directors.append((i.name)) # get list of songs with info to easily access [not the only way to do this]
+        all_directors.append((i.name))
     return render_template('all_directors.html',all_directors=all_directors)
 
-# @app.route('/all_artists')
-# def see_all_artists():
-#     artists = Artist.query.all()
-#     names = []
-#     for a in artists:
-#         num_songs = len(Song.query.filter_by(artist_id=a.id).all())
-#         newtup = (a.name,num_songs)
-#         names.append(newtup) # names will be a list of tuples
-#     return render_template('all_artists.html',artist_names=names)
 
 if __name__ == '__main__':
-    db.create_all() # This will create database in current directory, as set up, if it doesn't exist, but won't overwrite if you restart - so no worries about that
-    app.run() # run with this: python main_app.py runserver
+    db.create_all()
+    app.run() 
