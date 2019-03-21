@@ -1,4 +1,28 @@
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+  $(document).ready(function(){
+      $("p").hide();
+    $("#show").click(function(){
+      $("p").show();
+    });
+  });
+</script>
+</head>
+<body>
 
 <div class="page-header">
     <h1>{% if num_movies %}{{ num_movies }}{% else %}0{% endif %} movies saved.</h1>
 </div>
+
+<button id="show">see how to add data</button>
+
+<p>
+Hint:
+If you fill out the following info accordingly while adding to your route:</p>
+<p>
+"/movie/new/(title)/(director)/(distributor)/(major_genre)/(us_gross)/(worldwide_gross)/(us_dvd_sales)/(production_budget)/"
+
+</p>
+</body>
+</html>
